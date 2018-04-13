@@ -3,7 +3,7 @@ package com.vehicle.router;
 public class NativeLibraryRunner {
 
     static {
-        System.loadLibrary("hello");
+        System.loadLibrary("cuda-vehicle-router-lib");
     }
 
     public native void helloNative();

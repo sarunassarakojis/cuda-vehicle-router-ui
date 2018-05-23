@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<GridPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+          fx:controller="controller.RoutingController" hgap="10" vgap="10"
+          alignment="CENTER" styleClass="root">
+    <padding>
+        <Insets top="25" bottom="25" right="25" left="25"/>
+    </padding>
+
+    <HBox spacing="10" alignment="CENTER_LEFT" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2">
+        <Label text="Depot X Coordinate:"/>
+        <TextField promptText="X" text="0"/>
+
+        <Label text="Depot Y Coordinate:"/>
+        <TextField promptText="Y" text="0"/>
+
+        <Label text="Vehicle Capacity:"/>
+        <TextField promptText="100"/>
+    </HBox>
+
+    <TabPane tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="0"
+             GridPane.rowIndex="1" GridPane.rowSpan="2">
+        <Tab text="Input">
+            <VBox>
+                <TableView fx:id="inputDataTable">
+                    <columns>
+                        <TableColumn text="No"/>
+                        <TableColumn text="Coordinates">
+                            <columns>
+                                <TableColumn text="X"/>
+                                <TableColumn text="Y"/>
+                            </columns>
+                        </TableColumn>
+                        <TableColumn text="Demand"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <Tab text="Results">
+            <VBox>
+                <TableView>
+                    <columns>
+                        <TableColumn text="Route"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+    </TabPane>
+
+    <TextArea GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="2" editable="false"/>
+
+    <Button text="Add new entry" GridPane.columnIndex="0" GridPane.rowIndex="3" onAction="#addNewEntry"/>
+
+    <HBox alignment="CENTER_RIGHT" spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="3">
+        <Button text="Route"/>
+    </HBox>
+
+</GridPane>

@@ -3,60 +3,74 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<GridPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-          fx:controller="controller.RoutingController" hgap="10" vgap="10"
-          alignment="CENTER" styleClass="root">
-    <padding>
-        <Insets top="25" bottom="25" right="25" left="25"/>
-    </padding>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controller.RoutingController" styleClass="root">
 
-    <HBox spacing="10" alignment="CENTER_LEFT" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2">
-        <Label text="Depot X Coordinate:"/>
-        <TextField promptText="X" text="0"/>
+    <MenuBar>
+        <Menu text="File">
+            <MenuItem text="Exit" onAction="#exit"/>
+        </Menu>
+        <Menu text="Options">
+            <MenuItem text="Properties" onAction="#openOptions"/>
+        </Menu>
+    </MenuBar>
 
-        <Label text="Depot Y Coordinate:"/>
-        <TextField promptText="Y" text="0"/>
+    <GridPane alignment="CENTER" hgap="10" vgap="10">
+        <padding>
+            <Insets top="25" bottom="25" right="25" left="25"/>
+        </padding>
 
-        <Label text="Vehicle Capacity:"/>
-        <TextField promptText="100"/>
-    </HBox>
+        <HBox spacing="10" alignment="CENTER_LEFT" GridPane.columnIndex="0" GridPane.rowIndex="0"
+              GridPane.columnSpan="2">
+            <Label text="Depot X Coordinate:"/>
+            <TextField promptText="X" text="0"/>
 
-    <TabPane tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="0"
-             GridPane.rowIndex="1" GridPane.rowSpan="2">
-        <Tab text="Input">
-            <VBox>
-                <TableView fx:id="inputDataTable">
-                    <columns>
-                        <TableColumn text="No"/>
-                        <TableColumn text="Coordinates">
-                            <columns>
-                                <TableColumn text="X"/>
-                                <TableColumn text="Y"/>
-                            </columns>
-                        </TableColumn>
-                        <TableColumn text="Demand"/>
-                    </columns>
-                </TableView>
-            </VBox>
-        </Tab>
+            <Label text="Depot Y Coordinate:"/>
+            <TextField promptText="Y" text="0"/>
 
-        <Tab text="Results">
-            <VBox>
-                <TableView>
-                    <columns>
-                        <TableColumn text="Route"/>
-                    </columns>
-                </TableView>
-            </VBox>
-        </Tab>
-    </TabPane>
+            <Label text="Vehicle Capacity:"/>
+            <TextField promptText="100" text="100"/>
+        </HBox>
 
-    <TextArea GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="2" editable="false"/>
+        <TabPane tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="0"
+                 GridPane.rowIndex="1" GridPane.rowSpan="2">
+            <Tab text="Input">
+                <VBox>
+                    <TableView fx:id="inputDataTable">
+                        <columns>
+                            <TableColumn fx:id="nodeId" text="No."/>
+                            <TableColumn text="Coordinates">
+                                <columns>
+                                    <TableColumn fx:id="nodeX" text="X"/>
+                                    <TableColumn fx:id="nodeY" text="Y"/>
+                                </columns>
+                            </TableColumn>
+                            <TableColumn fx:id="nodeDemand" text="Demand"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
 
-    <Button text="Add new entry" GridPane.columnIndex="0" GridPane.rowIndex="3" onAction="#addNewEntry"/>
+            <Tab text="Results">
+                <VBox>
+                    <TableView>
+                        <columns>
+                            <TableColumn text="Route"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+        </TabPane>
 
-    <HBox alignment="CENTER_RIGHT" spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="3">
-        <Button text="Route"/>
-    </HBox>
+        <TextArea GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="2" editable="false"/>
 
-</GridPane>
+        <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="3">
+            <Button text="Add new entry" onAction="#addNewEntry"/>
+            <Button text="Delete" onAction="#deleteEntry"/>
+        </HBox>
+
+        <HBox alignment="CENTER_RIGHT" spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <Button text="Route" onAction="#route"/>
+        </HBox>
+    </GridPane>
+</VBox>

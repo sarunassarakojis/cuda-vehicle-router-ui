@@ -15,6 +15,9 @@ public class VehicleRouterApp extends Application {
 
     private static BorderPane root = new BorderPane();
 
+    public static int algorithmType = 0;
+    public static String serverIp = "http://87.247.109.240:60";
+
     @Override
     public void start(Stage primaryStage) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/layout/RoutingWindow.fxml"));

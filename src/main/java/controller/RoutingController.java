@@ -118,8 +118,7 @@ public class RoutingController {
 
     private void route() {
         try {
-            Thread.sleep(5000);
-            AlertUtil.displayAlert(Alert.AlertType.ERROR, "Unresponsive server", "Server did not respond");
+            // route
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

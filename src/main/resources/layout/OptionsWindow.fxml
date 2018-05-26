@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="controller.OptionsController">
+      fx:controller="com.vehicle.router.controller.OptionsController">
 
     <MenuBar>
         <Menu text="File">
@@ -22,11 +22,12 @@
 
         <Label text="Server IP:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
         <TextField fx:id="serverIp" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+        <Button text="Test" GridPane.columnIndex="2" GridPane.rowIndex="0" onAction="#testConnectionWithServer"/>
 
         <Label text="Algorithm Type:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
         <ComboBox fx:id="algorithmType" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-        <HBox alignment="CENTER_RIGHT" spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="2">
+        <HBox alignment="BOTTOM_RIGHT" spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="3">
             <Button text="Cancel" onAction="#cancel"/>
             <Button text="Save" onAction="#save"/>
         </HBox>

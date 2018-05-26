@@ -1,14 +1,11 @@
-package controller;
+package com.vehicle.router.controller;
 
-import com.vehicle.router.main.VehicleRouterApp;
 import com.vehicle.router.model.Node;
-import com.vehicle.router.utils.AlertUtil;
 import com.vehicle.router.utils.Triple;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -57,6 +54,7 @@ public class RoutingController {
         });
     }
 
+    @FXML
     public void addNewEntry(ActionEvent actionEvent) {
         Dialog<Triple<Integer, Integer, Integer>> newEntryDialog = new Dialog<>();
 
@@ -96,6 +94,7 @@ public class RoutingController {
                 new Node(inputDataTable.getItems().size() + 1, t.first, t.second, t.third)));
     }
 
+    @FXML
     public void deleteEntry(ActionEvent actionEvent) {
         int selectedIndex = inputDataTable.getSelectionModel().getSelectedIndex();
 
@@ -104,25 +103,23 @@ public class RoutingController {
         }
     }
 
+    @FXML
     public void exit(ActionEvent actionEvent) {
         System.exit(0);
     }
 
+    @FXML
     public void openOptions(ActionEvent actionEvent) throws IOException {
         inputDataTable.getScene().setRoot(FXMLLoader.load(getClass().getResource("/layout/OptionsWindow.fxml")));
     }
 
+    @FXML
     public void route(ActionEvent actionEvent) {
         route();
     }
 
     private void route() {
-        try {
-            Thread.sleep(5000);
-            AlertUtil.displayAlert(Alert.AlertType.ERROR, "Unresponsive server", "Server did not respond");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
     }
 
     private static class Converter extends StringConverter<Integer> {

@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="controller.RoutingController" styleClass="root">
+      fx:controller="com.vehicle.router.controller.RoutingController" styleClass="root">
 
     <MenuBar>
         <Menu text="File">

@@ -7,7 +7,7 @@ public final class RoutingApiTargets {
 
     private static final String ROUTING = "routing";
     private static final String SEQUENTIAL = "sequential";
-    private static final String PARALLEL = "sequential";
+    private static final String PARALLEL = "parallel";
     private static final String DEVICES = "devices";
 
     public static WebTarget getSequentialRoutingTarget() {

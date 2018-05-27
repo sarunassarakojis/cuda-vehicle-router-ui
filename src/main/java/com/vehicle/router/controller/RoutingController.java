@@ -1,7 +1,15 @@
 package com.vehicle.router.controller;
 
+import com.vehicle.router.http.RoutingApiTargets;
+import com.vehicle.router.http.RoutingRequestEntity;
 import com.vehicle.router.model.Node;
+import com.vehicle.router.model.Route;
+import com.vehicle.router.utils.AlertUtil;
 import com.vehicle.router.utils.Triple;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,12 +18,26 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.util.List;
 
 public class RoutingController {
 
+    @FXML
+    public TextField depotX;
+    @FXML
+    public TextField depotY;
+    @FXML
+    public TextField vehicleCapacity;
+    @FXML
+    public TabPane tabPane;
     @FXML
     private TableColumn nodeDemand;
     @FXML
@@ -26,14 +48,18 @@ public class RoutingController {
     private TableColumn nodeId;
     @FXML
     private TableView<Node> inputDataTable;
+    @FXML
+    public TableView<Route> resultsTable;
+    @FXML
+    public TableColumn<Route, String> route;
+    @FXML
+    public TableColumn<Route, Integer> metDemand;
 
     @FXML
-    @SuppressWarnings("unchecked")
     public void initialize() {
         Converter converter = new Converter();
 
-        inputDataTable.setEditable(true);
-        nodeId.setCellValueFactory(new PropertyValueFactory<Node, Integer>("id"));
+        nodeId.setCellValueFactory(new PropertyValueFactory<Node, Integer>("indice"));
         nodeX.setCellValueFactory(new PropertyValueFactory<Node, Integer>("x"));
         nodeX.setCellFactory(TextFieldTableCell.<String, Integer>forTableColumn(converter));
         nodeX.setOnEditCommit(event -> {
@@ -52,6 +78,14 @@ public class RoutingController {
             TableColumn.CellEditEvent<Node, Integer> e = (TableColumn.CellEditEvent<Node, Integer>) event;
             e.getTableView().getItems().get(e.getTablePosition().getRow()).setDemand(e.getNewValue());
         });
+
+        route.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Route, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<Route, String> param) {
+                return new SimpleStringProperty(param.getValue().getNodesAsString());
+            }
+        });
+        metDemand.setCellValueFactory(new PropertyValueFactory<>("metDemand"));
     }
 
     @FXML
@@ -115,11 +149,24 @@ public class RoutingController {
 
     @FXML
     public void route(ActionEvent actionEvent) {
-        route();
-    }
+        try {
+            RoutingRequestEntity requestData = new RoutingRequestEntity(Integer.valueOf(vehicleCapacity.getText()));
 
-    private void route() {
+            requestData.addNode(new Node(0, Integer.valueOf(depotX.getText()), Integer.valueOf(depotY.getText()), 0));
+            inputDataTable.getItems().forEach(requestData::addNode);
 
+            WebTarget target = RoutingApiTargets.getParallelRoutingTarget();
+
+            List<Route> post = target.request(MediaType.APPLICATION_JSON)
+                    .post(Entity.entity(requestData, MediaType.APPLICATION_JSON), new GenericType<List<Route>>() {
+                    });
+
+            ObservableList<Route> routes = FXCollections.observableArrayList(post);
+            resultsTable.setItems(routes);
+            tabPane.getSelectionModel().select(1);
+        } catch (Exception e) {
+            AlertUtil.displayExceptionAlert(e, "Failure to Process Request", "Routing request cannot be completed");
+        }
     }
 
     private static class Converter extends StringConverter<Integer> {

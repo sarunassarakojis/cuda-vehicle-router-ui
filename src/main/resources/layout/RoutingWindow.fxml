@@ -23,20 +23,20 @@
         <HBox spacing="10" alignment="CENTER_LEFT" GridPane.columnIndex="0" GridPane.rowIndex="0"
               GridPane.columnSpan="2">
             <Label text="Depot X Coordinate:"/>
-            <TextField promptText="X" text="0"/>
+            <TextField fx:id="depotX" promptText="X" text="0"/>
 
             <Label text="Depot Y Coordinate:"/>
-            <TextField promptText="Y" text="0"/>
+            <TextField fx:id="depotY" promptText="Y" text="0"/>
 
             <Label text="Vehicle Capacity:"/>
-            <TextField promptText="100" text="100"/>
+            <TextField fx:id="vehicleCapacity" promptText="100" text="100"/>
         </HBox>
 
-        <TabPane tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="0"
+        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="0"
                  GridPane.rowIndex="1" GridPane.rowSpan="2">
             <Tab text="Input">
                 <VBox>
-                    <TableView fx:id="inputDataTable">
+                    <TableView fx:id="inputDataTable" editable="true">
                         <columns>
                             <TableColumn fx:id="nodeId" text="No."/>
                             <TableColumn text="Coordinates">
@@ -53,9 +53,10 @@
 
             <Tab text="Results">
                 <VBox>
-                    <TableView>
+                    <TableView fx:id="resultsTable">
                         <columns>
-                            <TableColumn text="Route"/>
+                            <TableColumn fx:id="metDemand" text="Met Demand"/>
+                            <TableColumn fx:id="route" text="Route"/>
                         </columns>
                     </TableView>
                 </VBox>

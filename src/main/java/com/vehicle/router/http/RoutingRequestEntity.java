@@ -46,6 +46,6 @@ public class RoutingRequestEntity {
 
     @Override
     public String toString() {
-        return String.format("[Max capacity: %d, nodes: %s]", vehicle_capacity, nodes);
+        return String.format("[Max capacity: %d, nodes amount: %d]", vehicle_capacity, nodes.size());
     }
 }

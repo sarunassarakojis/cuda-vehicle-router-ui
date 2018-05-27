@@ -1,7 +1,7 @@
 package com.vehicle.router.controller;
 
-import com.vehicle.router.http.RoutingApiTargets;
 import com.vehicle.router.http.RoutingRequestEntity;
+import com.vehicle.router.http.consumer.RoutingServiceConsumer;
 import com.vehicle.router.model.Node;
 import com.vehicle.router.model.Route;
 import com.vehicle.router.utils.AlertUtil;
@@ -21,12 +21,7 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.util.List;
 
 public class RoutingController {
 
@@ -150,23 +145,23 @@ public class RoutingController {
     @FXML
     public void route(ActionEvent actionEvent) {
         try {
-            RoutingRequestEntity requestData = new RoutingRequestEntity(Integer.valueOf(vehicleCapacity.getText()));
+            ObservableList<Route> routes = FXCollections.observableArrayList(
+                    RoutingServiceConsumer.consumeParallelRoutingService(constructRoutingRequestData()));
 
-            requestData.addNode(new Node(0, Integer.valueOf(depotX.getText()), Integer.valueOf(depotY.getText()), 0));
-            inputDataTable.getItems().forEach(requestData::addNode);
-
-            WebTarget target = RoutingApiTargets.getParallelRoutingTarget();
-
-            List<Route> post = target.request(MediaType.APPLICATION_JSON)
-                    .post(Entity.entity(requestData, MediaType.APPLICATION_JSON), new GenericType<List<Route>>() {
-                    });
-
-            ObservableList<Route> routes = FXCollections.observableArrayList(post);
             resultsTable.setItems(routes);
             tabPane.getSelectionModel().select(1);
         } catch (Exception e) {
             AlertUtil.displayExceptionAlert(e, "Failure to Process Request", "Routing request cannot be completed");
         }
+    }
+
+    private RoutingRequestEntity constructRoutingRequestData() {
+        RoutingRequestEntity requestData = new RoutingRequestEntity(Integer.valueOf(vehicleCapacity.getText()));
+
+        requestData.addNode(new Node(0, Integer.valueOf(depotX.getText()), Integer.valueOf(depotY.getText()), 0));
+        inputDataTable.getItems().forEach(requestData::addNode);
+
+        return requestData;
     }
 
     private static class Converter extends StringConverter<Integer> {

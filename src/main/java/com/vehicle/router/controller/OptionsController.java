@@ -1,6 +1,6 @@
 package com.vehicle.router.controller;
 
-import com.vehicle.router.http.RoutingApiTargets;
+import com.vehicle.router.http.consumer.DeviceInfoServiceConsumer;
 import com.vehicle.router.main.VehicleRouterApp;
 import com.vehicle.router.model.DeviceInfo;
 import com.vehicle.router.utils.AlertUtil;
@@ -12,10 +12,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 
@@ -54,10 +50,7 @@ public class OptionsController {
     @FXML
     public void testConnectionWithServer(ActionEvent actionEvent) {
         try {
-            WebTarget target = RoutingApiTargets.getDevicesTarget();
-            Response response = target.request(MediaType.APPLICATION_JSON_TYPE).get(Response.class);
-            List<DeviceInfo> devices = response.readEntity(new GenericType<List<DeviceInfo>>() {
-            });
+            List<DeviceInfo> devices = DeviceInfoServiceConsumer.consumeDeviceInfoService();
 
             if (devices.size() > 0) {
                 DeviceInfo d = devices.get(0);

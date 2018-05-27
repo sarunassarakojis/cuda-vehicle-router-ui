@@ -34,13 +34,13 @@ public class RoutingController {
     @FXML
     public TabPane tabPane;
     @FXML
-    private TableColumn nodeDemand;
+    private TableColumn<Node, Integer> nodeDemand;
     @FXML
-    private TableColumn nodeY;
+    private TableColumn<Node, Integer> nodeY;
     @FXML
-    private TableColumn nodeX;
+    private TableColumn<Node, Integer> nodeX;
     @FXML
-    private TableColumn nodeId;
+    private TableColumn<Node, Integer> nodeId;
     @FXML
     private TableView<Node> inputDataTable;
     @FXML
@@ -54,32 +54,25 @@ public class RoutingController {
     public void initialize() {
         Converter converter = new Converter();
 
-        nodeId.setCellValueFactory(new PropertyValueFactory<Node, Integer>("indice"));
-        nodeX.setCellValueFactory(new PropertyValueFactory<Node, Integer>("x"));
-        nodeX.setCellFactory(TextFieldTableCell.<String, Integer>forTableColumn(converter));
-        nodeX.setOnEditCommit(event -> {
-            TableColumn.CellEditEvent<Node, Integer> e = (TableColumn.CellEditEvent<Node, Integer>) event;
-            e.getTableView().getItems().get(e.getTablePosition().getRow()).setX(e.getNewValue());
-        });
-        nodeY.setCellValueFactory(new PropertyValueFactory<Node, Integer>("y"));
-        nodeY.setCellFactory(TextFieldTableCell.<String, Integer>forTableColumn(converter));
-        nodeY.setOnEditCommit(event -> {
-            TableColumn.CellEditEvent<Node, Integer> e = (TableColumn.CellEditEvent<Node, Integer>) event;
-            e.getTableView().getItems().get(e.getTablePosition().getRow()).setY(e.getNewValue());
-        });
-        nodeDemand.setCellValueFactory(new PropertyValueFactory<Node, Integer>("demand"));
-        nodeDemand.setCellFactory(TextFieldTableCell.<String, Integer>forTableColumn(converter));
-        nodeDemand.setOnEditCommit(event -> {
-            TableColumn.CellEditEvent<Node, Integer> e = (TableColumn.CellEditEvent<Node, Integer>) event;
-            e.getTableView().getItems().get(e.getTablePosition().getRow()).setDemand(e.getNewValue());
-        });
+        nodeId.setCellValueFactory(new PropertyValueFactory<>("indice"));
 
-        route.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Route, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Route, String> param) {
-                return new SimpleStringProperty(param.getValue().getNodesAsString());
-            }
-        });
+        nodeX.setCellValueFactory(new PropertyValueFactory<>("x"));
+        nodeX.setCellFactory(TextFieldTableCell.forTableColumn(converter));
+        nodeX.setOnEditCommit(event ->
+                event.getTableView().getItems().get(event.getTablePosition().getRow()).setX(event.getNewValue()));
+
+        nodeY.setCellValueFactory(new PropertyValueFactory<>("y"));
+        nodeY.setCellFactory(TextFieldTableCell.forTableColumn(converter));
+        nodeY.setOnEditCommit(event ->
+                event.getTableView().getItems().get(event.getTablePosition().getRow()).setY(event.getNewValue()));
+
+        nodeDemand.setCellValueFactory(new PropertyValueFactory<>("demand"));
+        nodeDemand.setCellFactory(TextFieldTableCell.forTableColumn(converter));
+        nodeDemand.setOnEditCommit(event ->
+                event.getTableView().getItems().get(event.getTablePosition().getRow()).setDemand(event.getNewValue()));
+
+        route.setCellValueFactory(callback -> new SimpleStringProperty(callback.getValue().getNodesAsString()));
+
         metDemand.setCellValueFactory(new PropertyValueFactory<>("metDemand"));
     }
 

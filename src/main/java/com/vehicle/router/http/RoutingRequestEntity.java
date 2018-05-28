@@ -8,24 +8,24 @@ import java.util.List;
 
 public class RoutingRequestEntity {
 
-    private int vehicle_capacity;
+    private int vehicleCapacity;
     private List<Node> nodes;
 
     public RoutingRequestEntity() {
         this.nodes = new ArrayList<>();
     }
 
-    public RoutingRequestEntity(int vehicle_capacity, List<Node> nodes) {
-        this.vehicle_capacity = vehicle_capacity;
+    public RoutingRequestEntity(int vehicleCapacity, List<Node> nodes) {
+        this.vehicleCapacity = vehicleCapacity;
         this.nodes = nodes;
     }
 
-    public RoutingRequestEntity(int vehicle_capacity) {
-        this(vehicle_capacity, new ArrayList<>());
+    public RoutingRequestEntity(int vehicleCapacity) {
+        this(vehicleCapacity, new ArrayList<>());
     }
 
-    public int getVehicle_capacity() {
-        return vehicle_capacity;
+    public int getVehicleCapacity() {
+        return vehicleCapacity;
     }
 
     public List<Node> getNodes() {
@@ -41,11 +41,11 @@ public class RoutingRequestEntity {
     }
 
     public void setVehicleCapacity(int vehicle_capacity) {
-        this.vehicle_capacity = vehicle_capacity;
+        this.vehicleCapacity = vehicle_capacity;
     }
 
     @Override
     public String toString() {
-        return String.format("[Max capacity: %d, nodes amount: %d]", vehicle_capacity, nodes.size());
+        return String.format("[Max capacity: %d, nodes amount: %d]", vehicleCapacity, nodes.size());
     }
 }

@@ -4,11 +4,12 @@ import com.vehicle.router.http.RoutingRequestEntity;
 import com.vehicle.router.http.consumer.RoutingServiceConsumer;
 import com.vehicle.router.model.Node;
 import com.vehicle.router.model.Route;
+import com.vehicle.router.plotting.CartesianAxes;
+import com.vehicle.router.plotting.GraphPlotter;
+import com.vehicle.router.plotting.InputDataChangeListener;
 import com.vehicle.router.utils.AlertUtil;
 import com.vehicle.router.utils.Triple;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,21 +19,22 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
-import javafx.util.Callback;
+import javafx.scene.layout.StackPane;
 import javafx.util.StringConverter;
 
 import java.io.IOException;
+import java.util.List;
 
 public class RoutingController {
 
     @FXML
-    public TextField depotX;
+    private TextField depotX;
     @FXML
-    public TextField depotY;
+    private TextField depotY;
     @FXML
-    public TextField vehicleCapacity;
+    private TextField vehicleCapacity;
     @FXML
-    public TabPane tabPane;
+    private TabPane tabPane;
     @FXML
     private TableColumn<Node, Integer> nodeDemand;
     @FXML
@@ -44,11 +46,13 @@ public class RoutingController {
     @FXML
     private TableView<Node> inputDataTable;
     @FXML
-    public TableView<Route> resultsTable;
+    private TableView<Route> resultsTable;
     @FXML
-    public TableColumn<Route, String> route;
+    private TableColumn<Route, String> route;
     @FXML
-    public TableColumn<Route, Integer> metDemand;
+    private TableColumn<Route, Integer> metDemand;
+    @FXML
+    private StackPane stackPane;
 
     @FXML
     public void initialize() {
@@ -58,22 +62,23 @@ public class RoutingController {
 
         nodeX.setCellValueFactory(new PropertyValueFactory<>("x"));
         nodeX.setCellFactory(TextFieldTableCell.forTableColumn(converter));
-        nodeX.setOnEditCommit(event ->
-                event.getTableView().getItems().get(event.getTablePosition().getRow()).setX(event.getNewValue()));
+        nodeX.setOnEditCommit(this::modifyNodeXCoordinate);
 
         nodeY.setCellValueFactory(new PropertyValueFactory<>("y"));
         nodeY.setCellFactory(TextFieldTableCell.forTableColumn(converter));
-        nodeY.setOnEditCommit(event ->
-                event.getTableView().getItems().get(event.getTablePosition().getRow()).setY(event.getNewValue()));
+        nodeY.setOnEditCommit(this::modifyNodeYCoordinate);
 
         nodeDemand.setCellValueFactory(new PropertyValueFactory<>("demand"));
         nodeDemand.setCellFactory(TextFieldTableCell.forTableColumn(converter));
-        nodeDemand.setOnEditCommit(event ->
-                event.getTableView().getItems().get(event.getTablePosition().getRow()).setDemand(event.getNewValue()));
+        nodeDemand.setOnEditCommit(this::modifyNodeDemand);
 
         route.setCellValueFactory(callback -> new SimpleStringProperty(callback.getValue().getNodesAsString()));
-
         metDemand.setCellValueFactory(new PropertyValueFactory<>("metDemand"));
+
+        GraphPlotter plotter = new GraphPlotter(new CartesianAxes(450, 400));
+
+        stackPane.getChildren().add(plotter);
+        inputDataTable.getItems().addListener(new InputDataChangeListener(plotter));
     }
 
     @FXML
@@ -138,10 +143,9 @@ public class RoutingController {
     @FXML
     public void route(ActionEvent actionEvent) {
         try {
-            ObservableList<Route> routes = FXCollections.observableArrayList(
-                    RoutingServiceConsumer.consumeParallelRoutingService(constructRoutingRequestData()));
+            List<Route> routes = RoutingServiceConsumer.consumeParallelRoutingService(constructRoutingRequestData());
 
-            resultsTable.setItems(routes);
+            resultsTable.getItems().addAll(routes);
             tabPane.getSelectionModel().select(1);
         } catch (Exception e) {
             AlertUtil.displayExceptionAlert(e, "Failure to Process Request", "Routing request cannot be completed");
@@ -155,6 +159,33 @@ public class RoutingController {
         inputDataTable.getItems().forEach(requestData::addNode);
 
         return requestData;
+    }
+
+    private void modifyNodeXCoordinate(TableColumn.CellEditEvent<Node, Integer> event) {
+        int row = event.getTablePosition().getRow();
+        ObservableList<Node> items = event.getTableView().getItems();
+        Node node = items.get(row);
+
+        node.setX(event.getNewValue());
+        items.set(row, node);
+    }
+
+    private void modifyNodeYCoordinate(TableColumn.CellEditEvent<Node, Integer> event) {
+        int row = event.getTablePosition().getRow();
+        ObservableList<Node> items = event.getTableView().getItems();
+        Node node = items.get(row);
+
+        node.setY(event.getNewValue());
+        items.set(row, node);
+    }
+
+    private void modifyNodeDemand(TableColumn.CellEditEvent<Node, Integer> event) {
+        int row = event.getTablePosition().getRow();
+        ObservableList<Node> items = event.getTableView().getItems();
+        Node node = items.get(row);
+
+        node.setDemand(event.getNewValue());
+        items.set(row, node);
     }
 
     private static class Converter extends StringConverter<Integer> {

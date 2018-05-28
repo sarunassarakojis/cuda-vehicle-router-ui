@@ -9,6 +9,7 @@ public final class RoutingApiTargets {
     private static final String SEQUENTIAL = "sequential";
     private static final String PARALLEL = "parallel";
     private static final String DEVICES = "devices";
+    private static final String HOST_IP = "http://192.168.0.2:6060";
 
     public static WebTarget getSequentialRoutingTarget() {
         return getRoutingTarget(SEQUENTIAL);
@@ -19,12 +20,12 @@ public final class RoutingApiTargets {
     }
 
     public static WebTarget getDevicesTarget() {
-        return ClientBuilder.newClient().target("http://localhost:6060")
+        return ClientBuilder.newClient().target(HOST_IP)
                 .path(DEVICES);
     }
 
     private static WebTarget getRoutingTarget(String type) {
-        return ClientBuilder.newClient().target("http://localhost:6060")
+        return ClientBuilder.newClient().target(HOST_IP)
                 .path(ROUTING).path(type);
     }
 }

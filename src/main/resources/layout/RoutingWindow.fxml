@@ -63,7 +63,12 @@
             </Tab>
         </TabPane>
 
-        <TextArea GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="2" editable="false"/>
+        <StackPane fx:id="stackPane" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="2">
+            <padding>
+                <Insets topRightBottomLeft="10"/>
+            </padding>
+            <style>-fx-background-color: rgb(230, 230, 230);</style>
+        </StackPane>
 
         <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="3">
             <Button text="Add new entry" onAction="#addNewEntry"/>

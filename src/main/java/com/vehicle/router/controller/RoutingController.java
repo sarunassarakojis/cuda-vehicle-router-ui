@@ -75,7 +75,7 @@ public class RoutingController {
         route.setCellValueFactory(callback -> new SimpleStringProperty(callback.getValue().getNodesAsString()));
         metDemand.setCellValueFactory(new PropertyValueFactory<>("metDemand"));
 
-        GraphPlotter plotter = new GraphPlotter(new CartesianAxes(450, 400));
+        GraphPlotter plotter = new GraphPlotter(new CartesianAxes(450, 400), inputDataTable.getItems());
 
         stackPane.getChildren().add(plotter);
         inputDataTable.getItems().addListener(new InputDataChangeListener(plotter));
@@ -126,7 +126,18 @@ public class RoutingController {
         int selectedIndex = inputDataTable.getSelectionModel().getSelectedIndex();
 
         if (selectedIndex != -1) {
+            decrementNodeIds(selectedIndex + 1);
             inputDataTable.getItems().remove(selectedIndex);
+        }
+    }
+
+    private void decrementNodeIds(int startIndex) {
+        ObservableList<Node> items = inputDataTable.getItems();
+
+        for (int i = startIndex, n = items.size(); i < n; ++i) {
+            Node node = items.get(i);
+
+            node.setIndice(node.getIndice() - 1);
         }
     }
 
@@ -145,6 +156,7 @@ public class RoutingController {
         try {
             List<Route> routes = RoutingServiceConsumer.consumeParallelRoutingService(constructRoutingRequestData());
 
+            resultsTable.getItems().clear();
             resultsTable.getItems().addAll(routes);
             tabPane.getSelectionModel().select(1);
         } catch (Exception e) {
@@ -182,10 +194,8 @@ public class RoutingController {
     private void modifyNodeDemand(TableColumn.CellEditEvent<Node, Integer> event) {
         int row = event.getTablePosition().getRow();
         ObservableList<Node> items = event.getTableView().getItems();
-        Node node = items.get(row);
 
-        node.setDemand(event.getNewValue());
-        items.set(row, node);
+        items.get(row).setDemand(event.getNewValue());
     }
 
     private static class Converter extends StringConverter<Integer> {

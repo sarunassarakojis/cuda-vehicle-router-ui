@@ -1,19 +1,27 @@
 package com.vehicle.router.plotting;
 
+import com.vehicle.router.model.Node;
+import javafx.collections.ObservableList;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Paint;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 
+import java.util.function.Consumer;
+
 public class GraphPlotter extends Pane {
 
-    private CartesianAxes axes;
+    private static final int GROWTH = 2;
 
+    private final ObservableList<Node> nodes;
+    private CartesianAxes axes;
     private final double actualWidth;
     private final double actualHeight;
 
-    public GraphPlotter(CartesianAxes axes) {
+    public GraphPlotter(CartesianAxes axes, ObservableList<Node> nodes) {
         this.axes = axes;
+        this.nodes = nodes;
         this.actualWidth = axes.getPrefWidth();
         this.actualHeight = axes.getPrefHeight();
 
@@ -29,17 +37,81 @@ public class GraphPlotter extends Pane {
         setPrefSize(axes.getPrefWidth(), axes.getPrefHeight());
         setMaxSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
 
-//        getChildren().setAll(axes, path, node2);
         getChildren().add(axes);
     }
 
-    public void addCircle(int centerX, int centerY, String text) {
-        double x = mapX(centerX);
-        double y = mapY(centerY);
-        Circle circle = new Circle(x, y, 5.0d, Paint.valueOf("rgb(255,102,136)"));
-        Text circleText = new Text(x, y, text);
+    public void operateOnNode(int nodeIndex, Consumer<Node> nodeConsumer) {
+        Node node = nodes.get(nodeIndex);
+        int absoluteX = Math.abs(node.getX());
+        int absoluteY = Math.abs(node.getY());
+        boolean outOfBoundsX = absoluteX > axes.getAxisX().getUpperBound();
+        boolean outOfBoundsY = absoluteY > axes.getAxisY().getUpperBound();
 
-        getChildren().addAll(circle, circleText);
+        if (outOfBoundsX && outOfBoundsY) {
+            getChildren().remove(1, getChildren().size());
+            scaleAxis(axes.getAxisX(), absoluteX);
+            scaleAxis(axes.getAxisY(), absoluteY);
+            addAllCircles();
+        } else if (outOfBoundsX) {
+            getChildren().remove(1, getChildren().size());
+            scaleAxis(axes.getAxisX(), absoluteX);
+            addAllCircles();
+        } else if (outOfBoundsY) {
+            getChildren().remove(1, getChildren().size());
+            scaleAxis(axes.getAxisY(), absoluteY);
+            addAllCircles();
+        } else {
+            nodeConsumer.accept(node);
+        }
+    }
+
+    public void addNode(int nodeIndex) {
+        operateOnNode(nodeIndex, node ->
+                addCircleWithText(mapX(node.getX()), mapY(node.getY()), node.getIndice()));
+    }
+
+    public void updateNode(int nodeIndex) {
+        operateOnNode(nodeIndex, node -> {
+            int actualIndex = nodeIndex * 2 + 1;
+            Circle circle = (Circle) getChildren().get(actualIndex);
+            Text circleText = (Text) getChildren().get(actualIndex + 1);
+            double mappedX = mapX(node.getX());
+            double mappedY = mapY(node.getY());
+
+            circle.setCenterX(mappedX);
+            circle.setCenterY(mappedY);
+            circleText.setX(mappedX);
+            circleText.setY(mappedY);
+        });
+    }
+
+    public void deleteNode(int nodeIndex) {
+        int indexInNodes = nodeIndex;
+        int actualIndex = nodeIndex * 2 + 1;
+        ObservableList<javafx.scene.Node> graphNodes = getChildren();
+
+        graphNodes.remove(actualIndex, actualIndex + 2);
+
+        for (int i = actualIndex + 1, n = graphNodes.size(); i < n; i += 2) {
+            Text text = (Text) graphNodes.get(i);
+
+            text.setText(String.valueOf(nodes.get(indexInNodes++).getIndice()));
+        }
+    }
+
+    private void scaleAxis(NumberAxis axis, double value) {
+        axis.setUpperBound(value + GROWTH);
+        axis.setLowerBound(-(value + GROWTH));
+    }
+
+    private void addAllCircles() {
+        for (Node node : nodes) {
+            addCircleWithText(mapX(node.getX()), mapY(node.getY()), node.getIndice());
+        }
+    }
+
+    private void addCircleWithText(double x, double y, int id) {
+        getChildren().addAll(createCircle(x, y), createCircleText(x, y, id));
     }
 
     private double mapX(double x) {
@@ -54,5 +126,13 @@ public class GraphPlotter extends Pane {
         double sy = actualHeight / (axes.getAxisY().getUpperBound() - axes.getAxisY().getLowerBound());
 
         return -y * sy + ty;
+    }
+
+    private static Circle createCircle(double x, double y) {
+        return new Circle(x, y, 5.0d, Color.rgb(255, 102, 136));
+    }
+
+    private static Text createCircleText(double x, double y, int id) {
+        return new Text(x, y, String.valueOf(id));
     }
 }

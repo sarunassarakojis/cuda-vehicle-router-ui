@@ -14,9 +14,14 @@ public class InputDataChangeListener implements ListChangeListener<Node> {
     @Override
     public void onChanged(Change<? extends Node> change) {
         while (change.next()) {
-            if (change.wasAdded()) {
-                Node addedNode = change.getList().get(change.getFrom());
-                graphPlotter.addCircle(addedNode.getX(), addedNode.getY(), String.valueOf(addedNode.getIndice()));
+            boolean wasReplaced = change.wasReplaced();
+
+            if (change.wasAdded() && !wasReplaced) {
+                graphPlotter.addNode(change.getFrom());
+            } else if (wasReplaced) {
+                graphPlotter.updateNode(change.getFrom());
+            } else if (change.wasRemoved()) {
+                graphPlotter.deleteNode(change.getFrom());
             }
         }
     }

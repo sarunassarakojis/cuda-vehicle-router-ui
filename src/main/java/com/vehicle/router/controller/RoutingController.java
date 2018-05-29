@@ -268,6 +268,7 @@ public class RoutingController {
 
     public void deleteAll(ActionEvent actionEvent) {
         inputDataTable.getItems().clear();
+        resultsTable.getItems().clear();
     }
 
     private static class Converter extends StringConverter<Integer> {

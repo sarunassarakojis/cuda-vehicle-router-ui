@@ -211,6 +211,14 @@ public class RoutingController {
     }
 
 
+    @FXML
+    public void toggleNumberAxes(ActionEvent actionEvent) {
+        CartesianAxes axes = graphPlotter.getAxes();
+
+        axes.getAxisX().setVisible(!axes.getAxisX().isVisible());
+        axes.getAxisY().setVisible(!axes.getAxisY().isVisible());
+    }
+
     private RoutingRequestEntity constructRoutingRequestData() {
         RoutingRequestEntity requestData = new RoutingRequestEntity(Integer.valueOf(vehicleCapacity.getText()));
 

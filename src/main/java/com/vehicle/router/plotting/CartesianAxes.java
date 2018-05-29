@@ -24,12 +24,14 @@ public class CartesianAxes extends Pane {
         axisX.setMinorTickVisible(false);
         axisX.setPrefWidth(width);
         axisX.setLayoutY(height / 2);
+        axisX.setVisible(false);
 
         axisY = new NumberAxis(yLow, yHi, yTickUnit);
         axisY.setSide(Side.LEFT);
         axisY.setMinorTickVisible(false);
         axisY.setPrefHeight(height);
         axisY.layoutXProperty().bind(Bindings.subtract((width / 2) + 1, axisY.widthProperty()));
+        axisY.setVisible(false);
 
         getChildren().setAll(axisX, axisY);
     }

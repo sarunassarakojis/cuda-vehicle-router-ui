@@ -178,6 +178,10 @@ public class GraphPlotter extends Pane {
         }
     }
 
+    public CartesianAxes getAxes() {
+        return axes;
+    }
+
     private void scaleAxis(NumberAxis axis, double value) {
         axis.setUpperBound(value + GROWTH);
         axis.setLowerBound(-(value + GROWTH));

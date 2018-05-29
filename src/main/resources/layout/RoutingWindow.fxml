@@ -80,6 +80,7 @@
         <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="3">
             <Button text="Add new entry" onAction="#addNewEntry"/>
             <Button text="Delete" onAction="#deleteEntry"/>
+            <Button text="Delete All" onAction="#deleteAll"/>
         </HBox>
 
         <HBox alignment="CENTER_RIGHT" spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="3">

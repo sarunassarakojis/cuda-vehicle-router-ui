@@ -46,6 +46,10 @@ public class GraphPlotter extends Pane {
                 createCircleText(mappedDepotX, mappedDepotY, "D"));
     }
 
+    public void clear() {
+        getChildren().remove(3, getChildren().size());
+    }
+
     public void operateOnNode(int nodeIndex, Consumer<Node> nodeConsumer) {
         Node node = nodes.get(nodeIndex);
         int absoluteX = Math.abs(node.getX());
@@ -164,10 +168,24 @@ public class GraphPlotter extends Pane {
     }
 
     public void addAllNodes() {
+        double maxX = axes.getAxisX().getUpperBound();
+        double maxY = axes.getAxisY().getUpperBound();
+
         for (int i = 0, n = nodes.size(); i < n; ++i) {
-            operateOnNode(i, node ->
-                    addCircleWithText(mapX(node.getX()), mapY(node.getY()), node.getIndice()));
+            Node node = nodes.get(i);
+            int absX = Math.abs(node.getX());
+            int absY = Math.abs(node.getY());
+
+            if (absX > maxX) {
+                maxX = absX;
+            }
+            if (absY > maxY) {
+                maxY = absY;
+            }
         }
+        scaleAxis(axes.getAxisX(), maxX);
+        scaleAxis(axes.getAxisY(), maxY);
+        addAllNodesNoScaling();
     }
 
     public void invalidateRoutes() {

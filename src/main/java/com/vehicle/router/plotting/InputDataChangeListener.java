@@ -27,7 +27,11 @@ public class InputDataChangeListener implements ListChangeListener<Node> {
             } else if (wasReplaced) {
                 graphPlotter.updateNode(change.getFrom());
             } else if (change.wasRemoved()) {
-                graphPlotter.deleteNode(change.getFrom());
+                if (change.getRemovedSize() == 1) {
+                    graphPlotter.deleteNode(change.getFrom());
+                } else {
+                    graphPlotter.clear();
+                }
             }
         }
     }

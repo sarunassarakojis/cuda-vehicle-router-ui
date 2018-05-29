@@ -171,6 +171,8 @@ public class RoutingController {
     public void route(ActionEvent actionEvent) {
         try {
             List<Route> routes;
+            double t1 = System.currentTimeMillis();
+            double t2;
 
             switch (VehicleRouterApp.algorithmType) {
                 case 0:
@@ -182,6 +184,9 @@ public class RoutingController {
                 default:
                     routes = new ArrayList<>();
             }
+            t2 = System.currentTimeMillis();
+
+            System.out.println(t2 - t1);
 
             graphPlotter.invalidateRoutes();
             resultsTable.getItems().clear();
@@ -259,6 +264,10 @@ public class RoutingController {
         } catch (NumberFormatException e) {
             return 0;
         }
+    }
+
+    public void deleteAll(ActionEvent actionEvent) {
+        inputDataTable.getItems().clear();
     }
 
     private static class Converter extends StringConverter<Integer> {

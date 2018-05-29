@@ -50,7 +50,7 @@ public class OptionsController {
     @FXML
     public void testConnectionWithServer(ActionEvent actionEvent) {
         try {
-            List<DeviceInfo> devices = DeviceInfoServiceConsumer.consumeDeviceInfoService();
+            List<DeviceInfo> devices = DeviceInfoServiceConsumer.consumeDeviceInfoService(serverIp.getText());
 
             if (devices.size() > 0) {
                 DeviceInfo d = devices.get(0);

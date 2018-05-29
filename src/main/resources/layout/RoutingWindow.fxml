@@ -8,6 +8,7 @@
 
     <MenuBar>
         <Menu text="File">
+            <MenuItem text="Open CSV..." onAction="#loadCsvFile"/>
             <MenuItem text="Exit" onAction="#exit"/>
         </Menu>
         <Menu text="Options">
@@ -36,7 +37,7 @@
                  GridPane.rowIndex="1" GridPane.rowSpan="2">
             <Tab text="Input">
                 <VBox>
-                    <TableView fx:id="inputDataTable" editable="true">
+                    <TableView fx:id="inputDataTable" editable="true" prefHeight="600">
                         <columns>
                             <TableColumn fx:id="nodeId" text="No."/>
                             <TableColumn text="Coordinates">
@@ -53,10 +54,13 @@
 
             <Tab text="Results">
                 <VBox>
-                    <TableView fx:id="resultsTable">
+                    <TableView fx:id="resultsTable" prefHeight="600">
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                        </columnResizePolicy>
                         <columns>
                             <TableColumn fx:id="metDemand" text="Met Demand"/>
-                            <TableColumn fx:id="route" text="Route"/>
+                            <TableColumn fx:id="route" text="Route" />
                         </columns>
                     </TableView>
                 </VBox>

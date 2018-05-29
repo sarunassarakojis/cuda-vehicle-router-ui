@@ -57,15 +57,15 @@ public class GraphPlotter extends Pane {
             getChildren().remove(3, getChildren().size());
             scaleAxis(axes.getAxisX(), absoluteX);
             scaleAxis(axes.getAxisY(), absoluteY);
-            addAllCircles();
+            addAllNodesNoScaling();
         } else if (outOfBoundsX) {
             getChildren().remove(3, getChildren().size());
             scaleAxis(axes.getAxisX(), absoluteX);
-            addAllCircles();
+            addAllNodesNoScaling();
         } else if (outOfBoundsY) {
             getChildren().remove(3, getChildren().size());
             scaleAxis(axes.getAxisY(), absoluteY);
-            addAllCircles();
+            addAllNodesNoScaling();
         } else {
             nodeConsumer.accept(node);
         }
@@ -113,7 +113,7 @@ public class GraphPlotter extends Pane {
         if (outOfBoundsX) {
             getChildren().remove(3, getChildren().size());
             scaleAxis(axes.getAxisX(), absoluteX);
-            addAllCircles();
+            addAllNodesNoScaling();
         }
 
         updateDepot(newDepotX, depotY);
@@ -127,7 +127,7 @@ public class GraphPlotter extends Pane {
         if (outOfBoundsY) {
             getChildren().remove(3, getChildren().size());
             scaleAxis(axes.getAxisY(), absoluteY);
-            addAllCircles();
+            addAllNodesNoScaling();
         }
 
         updateDepot(depotX, newDepotY);
@@ -163,6 +163,13 @@ public class GraphPlotter extends Pane {
         }
     }
 
+    public void addAllNodes() {
+        for (int i = 0, n = nodes.size(); i < n; ++i) {
+            operateOnNode(i, node ->
+                    addCircleWithText(mapX(node.getX()), mapY(node.getY()), node.getIndice()));
+        }
+    }
+
     public void invalidateRoutes() {
         if (routesCount > 0) {
             getChildren().remove(getChildren().size() - routesCount, getChildren().size());
@@ -176,7 +183,7 @@ public class GraphPlotter extends Pane {
         axis.setLowerBound(-(value + GROWTH));
     }
 
-    private void addAllCircles() {
+    private void addAllNodesNoScaling() {
         for (Node node : nodes) {
             addCircleWithText(mapX(node.getX()), mapY(node.getY()), node.getIndice());
         }

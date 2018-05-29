@@ -2,6 +2,7 @@ package com.vehicle.router.controller;
 
 import com.vehicle.router.http.RoutingRequestEntity;
 import com.vehicle.router.http.consumer.RoutingServiceConsumer;
+import com.vehicle.router.main.VehicleRouterApp;
 import com.vehicle.router.model.Node;
 import com.vehicle.router.model.Route;
 import com.vehicle.router.plotting.CartesianAxes;
@@ -9,6 +10,7 @@ import com.vehicle.router.plotting.GraphPlotter;
 import com.vehicle.router.plotting.InputDataChangeListener;
 import com.vehicle.router.plotting.RoutesSolveListener;
 import com.vehicle.router.utils.AlertUtil;
+import com.vehicle.router.utils.CsvReader;
 import com.vehicle.router.utils.Triple;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
@@ -21,9 +23,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RoutingController {
@@ -59,7 +64,7 @@ public class RoutingController {
     @FXML
     public void initialize() {
         Converter converter = new Converter();
-        graphPlotter = new GraphPlotter(new CartesianAxes(450, 400), inputDataTable.getItems());
+        graphPlotter = new GraphPlotter(new CartesianAxes(600, 600), inputDataTable.getItems());
 
         nodeId.setCellValueFactory(new PropertyValueFactory<>("indice"));
 
@@ -165,7 +170,18 @@ public class RoutingController {
     @FXML
     public void route(ActionEvent actionEvent) {
         try {
-            List<Route> routes = RoutingServiceConsumer.consumeParallelRoutingService(constructRoutingRequestData());
+            List<Route> routes;
+
+            switch (VehicleRouterApp.algorithmType) {
+                case 0:
+                    routes = RoutingServiceConsumer.consumeSequentialRoutingService(constructRoutingRequestData());
+                    break;
+                case 1:
+                    routes = RoutingServiceConsumer.consumeParallelRoutingService(constructRoutingRequestData());
+                    break;
+                default:
+                    routes = new ArrayList<>();
+            }
 
             graphPlotter.invalidateRoutes();
             resultsTable.getItems().clear();
@@ -175,6 +191,25 @@ public class RoutingController {
             AlertUtil.displayExceptionAlert(e, "Failure to Process Request", "Routing request cannot be completed");
         }
     }
+
+    @FXML
+    public void loadCsvFile(ActionEvent actionEvent) {
+        try {
+            File file;
+            FileChooser fileChooser = new FileChooser();
+
+            fileChooser.setTitle("Open CSV File");
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+
+            if ((file = fileChooser.showOpenDialog(inputDataTable.getScene().getWindow())) != null) {
+                inputDataTable.getItems().addAll(CsvReader.readCsvExcelFile(file));
+            }
+        } catch (IOException e) {
+            AlertUtil.displayExceptionAlert(e, "Error", "Error while parsing CSV file");
+        }
+    }
+
 
     private RoutingRequestEntity constructRoutingRequestData() {
         RoutingRequestEntity requestData = new RoutingRequestEntity(Integer.valueOf(vehicleCapacity.getText()));

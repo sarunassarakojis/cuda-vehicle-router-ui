@@ -14,4 +14,10 @@ public class DeviceInfoServiceConsumer {
                 .request(MediaType.APPLICATION_JSON)
                 .get(new GenericType<List<DeviceInfo>>() {});
     }
+
+    public static List<DeviceInfo> consumeDeviceInfoService(String uri) {
+        return RoutingApiTargets.getDevicesTarget(uri)
+                .request(MediaType.APPLICATION_JSON)
+                .get(new GenericType<List<DeviceInfo>>() {});
+    }
 }

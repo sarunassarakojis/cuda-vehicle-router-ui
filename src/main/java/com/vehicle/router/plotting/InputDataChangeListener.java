@@ -16,6 +16,8 @@ public class InputDataChangeListener implements ListChangeListener<Node> {
         while (change.next()) {
             boolean wasReplaced = change.wasReplaced();
 
+            graphPlotter.invalidateRoutes();
+
             if (change.wasAdded() && !wasReplaced) {
                 graphPlotter.addNode(change.getFrom());
             } else if (wasReplaced) {

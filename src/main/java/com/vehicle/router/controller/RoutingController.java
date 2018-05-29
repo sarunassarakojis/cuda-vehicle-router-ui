@@ -7,6 +7,7 @@ import com.vehicle.router.model.Route;
 import com.vehicle.router.plotting.CartesianAxes;
 import com.vehicle.router.plotting.GraphPlotter;
 import com.vehicle.router.plotting.InputDataChangeListener;
+import com.vehicle.router.plotting.RoutesSolveListener;
 import com.vehicle.router.utils.AlertUtil;
 import com.vehicle.router.utils.Triple;
 import javafx.beans.property.SimpleStringProperty;
@@ -53,10 +54,12 @@ public class RoutingController {
     private TableColumn<Route, Integer> metDemand;
     @FXML
     private StackPane stackPane;
+    private GraphPlotter graphPlotter;
 
     @FXML
     public void initialize() {
         Converter converter = new Converter();
+        graphPlotter = new GraphPlotter(new CartesianAxes(450, 400), inputDataTable.getItems());
 
         nodeId.setCellValueFactory(new PropertyValueFactory<>("indice"));
 
@@ -75,10 +78,18 @@ public class RoutingController {
         route.setCellValueFactory(callback -> new SimpleStringProperty(callback.getValue().getNodesAsString()));
         metDemand.setCellValueFactory(new PropertyValueFactory<>("metDemand"));
 
-        GraphPlotter plotter = new GraphPlotter(new CartesianAxes(450, 400), inputDataTable.getItems());
+        depotX.textProperty().addListener((observable, oldValue, newValue) -> {
+            graphPlotter.invalidateRoutes();
+            graphPlotter.updateDepotX(parseInt(newValue));
+        });
+        depotY.textProperty().addListener((observable, oldValue, newValue) -> {
+            graphPlotter.invalidateRoutes();
+            graphPlotter.updateDepotY(parseInt(newValue));
+        });
 
-        stackPane.getChildren().add(plotter);
-        inputDataTable.getItems().addListener(new InputDataChangeListener(plotter));
+        stackPane.getChildren().add(graphPlotter);
+        inputDataTable.getItems().addListener(new InputDataChangeListener(graphPlotter));
+        resultsTable.getItems().addListener(new RoutesSolveListener(graphPlotter));
     }
 
     @FXML
@@ -156,6 +167,7 @@ public class RoutingController {
         try {
             List<Route> routes = RoutingServiceConsumer.consumeParallelRoutingService(constructRoutingRequestData());
 
+            graphPlotter.invalidateRoutes();
             resultsTable.getItems().clear();
             resultsTable.getItems().addAll(routes);
             tabPane.getSelectionModel().select(1);
@@ -196,6 +208,14 @@ public class RoutingController {
         ObservableList<Node> items = event.getTableView().getItems();
 
         items.get(row).setDemand(event.getNewValue());
+    }
+
+    private static int parseInt(String s) {
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     private static class Converter extends StringConverter<Integer> {

@@ -8,10 +8,14 @@
 
     <MenuBar>
         <Menu text="File">
+            <MenuItem text="Open CSV..." disable="true"/>
             <MenuItem text="Exit" onAction="#exit"/>
         </Menu>
+        <Menu text="View">
+            <MenuItem text="Toggle Number Axes" disable="true"/>
+        </Menu>
         <Menu text="Options">
-            <MenuItem text="Properties"/>
+            <MenuItem text="Properties" disable="true"/>
         </Menu>
     </MenuBar>
 

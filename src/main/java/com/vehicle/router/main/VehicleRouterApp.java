@@ -17,6 +17,7 @@ public class VehicleRouterApp extends Application {
     public void start(Stage primaryStage) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/layout/RoutingWindow.fxml"));
 
+        System.setProperty("org.graphstream.ui", "javafx");
         primaryStage.setTitle("Vehicle Router UI");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();

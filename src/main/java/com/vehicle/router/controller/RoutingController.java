@@ -5,13 +5,13 @@ import com.vehicle.router.http.consumer.RoutingServiceConsumer;
 import com.vehicle.router.main.VehicleRouterApp;
 import com.vehicle.router.model.Node;
 import com.vehicle.router.model.Route;
-import com.vehicle.router.plotting.CartesianAxes;
-import com.vehicle.router.plotting.GraphPlotter;
+import com.vehicle.router.plotting.GraphingTool;
 import com.vehicle.router.plotting.InputDataChangeListener;
 import com.vehicle.router.plotting.RoutesSolveListener;
 import com.vehicle.router.utils.AlertUtil;
 import com.vehicle.router.utils.CsvReader;
 import com.vehicle.router.utils.Triple;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -22,9 +22,15 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.implementations.MultiGraph;
+import org.graphstream.ui.fx_viewer.FxDefaultView;
+import org.graphstream.ui.fx_viewer.FxViewer;
+import org.graphstream.ui.javafx.FxGraphRenderer;
+import org.graphstream.ui.view.Viewer;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,14 +64,19 @@ public class RoutingController {
     @FXML
     private TableColumn<Route, Integer> metDemand;
     @FXML
-    private StackPane stackPane;
-    private GraphPlotter graphPlotter;
+    private VBox stackPane;
+    private GraphingTool graphingTool;
+    private Graph graph;
 
     @FXML
     public void initialize() {
+        graph = new MultiGraph("vehicle-router-ui-graph");
+        graphingTool = new GraphingTool(graph);
         Converter converter = new Converter();
-        graphPlotter = new GraphPlotter(new CartesianAxes(600, 600), inputDataTable.getItems());
+        FxViewer viewer = new FxViewer(graph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+        FxDefaultView view = (FxDefaultView) viewer.addView(FxViewer.DEFAULT_VIEW_ID, new FxGraphRenderer(), false);
 
+        graph.setAttribute("ui.stylesheet", "url('" + getClass().getResource("/styles/graph.css") + "')");
         nodeId.setCellValueFactory(new PropertyValueFactory<>("indice"));
 
         nodeX.setCellValueFactory(new PropertyValueFactory<>("x"));
@@ -84,17 +95,17 @@ public class RoutingController {
         metDemand.setCellValueFactory(new PropertyValueFactory<>("metDemand"));
 
         depotX.textProperty().addListener((observable, oldValue, newValue) -> {
-            graphPlotter.invalidateRoutes();
-            graphPlotter.updateDepotX(parseInt(newValue));
-        });
-        depotY.textProperty().addListener((observable, oldValue, newValue) -> {
-            graphPlotter.invalidateRoutes();
-            graphPlotter.updateDepotY(parseInt(newValue));
+            // TODO: 6/6/2018 update depot x
         });
 
-        stackPane.getChildren().add(graphPlotter);
-        inputDataTable.getItems().addListener(new InputDataChangeListener(graphPlotter));
-        resultsTable.getItems().addListener(new RoutesSolveListener(graphPlotter));
+        depotY.textProperty().addListener((observable, oldValue, newValue) -> {
+            // TODO: 6/6/2018 update depot y
+        });
+
+        graphingTool.addDepot(parseInt(depotX.getText()), parseInt(depotY.getText()));
+        stackPane.getChildren().add(view);
+        inputDataTable.getItems().addListener(new InputDataChangeListener(graphingTool));
+        resultsTable.getItems().addListener(new RoutesSolveListener(graphingTool));
     }
 
     @FXML
@@ -130,11 +141,10 @@ public class RoutingController {
 
         newEntryDialog.getDialogPane().setContent(entryContent);
         newEntryDialog.setResultConverter(button -> button == ButtonType.OK ?
-                new Triple<>(Integer.valueOf(textX.getText()),
-                        Integer.valueOf(yCoordinate.getText()), Integer.valueOf(demand.getText())) : null);
+                new Triple<>(parseInt(textX.getText()), parseInt(yCoordinate.getText()), parseInt(demand.getText())) : null);
 
-        newEntryDialog.showAndWait().ifPresent(t -> inputDataTable.getItems().add(
-                new Node(inputDataTable.getItems().size() + 1, t.first, t.second, t.third)));
+        newEntryDialog.showAndWait().ifPresent(t -> inputDataTable.getItems()
+                .add(new Node(inputDataTable.getItems().size() + 1, t.first, t.second, t.third)));
     }
 
     @FXML
@@ -142,24 +152,13 @@ public class RoutingController {
         int selectedIndex = inputDataTable.getSelectionModel().getSelectedIndex();
 
         if (selectedIndex != -1) {
-            decrementNodeIds(selectedIndex + 1);
             inputDataTable.getItems().remove(selectedIndex);
-        }
-    }
-
-    private void decrementNodeIds(int startIndex) {
-        ObservableList<Node> items = inputDataTable.getItems();
-
-        for (int i = startIndex, n = items.size(); i < n; ++i) {
-            Node node = items.get(i);
-
-            node.setIndice(node.getIndice() - 1);
         }
     }
 
     @FXML
     public void exit(ActionEvent actionEvent) {
-        System.exit(0);
+        Platform.exit();
     }
 
     @FXML
@@ -171,8 +170,6 @@ public class RoutingController {
     public void route(ActionEvent actionEvent) {
         try {
             List<Route> routes;
-            double t1 = System.currentTimeMillis();
-            double t2;
 
             switch (VehicleRouterApp.algorithmType) {
                 case 0:
@@ -184,17 +181,19 @@ public class RoutingController {
                 default:
                     routes = new ArrayList<>();
             }
-            t2 = System.currentTimeMillis();
 
-            System.out.println(t2 - t1);
-
-            graphPlotter.invalidateRoutes();
             resultsTable.getItems().clear();
             resultsTable.getItems().addAll(routes);
             tabPane.getSelectionModel().select(1);
         } catch (Exception e) {
             AlertUtil.displayExceptionAlert(e, "Failure to Process Request", "Routing request cannot be completed");
         }
+    }
+
+    @FXML
+    public void deleteAll(ActionEvent actionEvent) {
+        inputDataTable.getItems().clear();
+        resultsTable.getItems().clear();
     }
 
     @FXML
@@ -215,19 +214,14 @@ public class RoutingController {
         }
     }
 
-
     @FXML
     public void toggleNumberAxes(ActionEvent actionEvent) {
-        CartesianAxes axes = graphPlotter.getAxes();
-
-        axes.getAxisX().setVisible(!axes.getAxisX().isVisible());
-        axes.getAxisY().setVisible(!axes.getAxisY().isVisible());
     }
 
     private RoutingRequestEntity constructRoutingRequestData() {
         RoutingRequestEntity requestData = new RoutingRequestEntity(Integer.valueOf(vehicleCapacity.getText()));
 
-        requestData.addNode(new Node(0, Integer.valueOf(depotX.getText()), Integer.valueOf(depotY.getText()), 0));
+        requestData.addNode(new Node(0, parseInt(depotX.getText()), parseInt(depotY.getText()), 0));
         inputDataTable.getItems().forEach(requestData::addNode);
 
         return requestData;
@@ -264,11 +258,6 @@ public class RoutingController {
         } catch (NumberFormatException e) {
             return 0;
         }
-    }
-
-    public void deleteAll(ActionEvent actionEvent) {
-        inputDataTable.getItems().clear();
-        resultsTable.getItems().clear();
     }
 
     private static class Converter extends StringConverter<Integer> {

@@ -3,20 +3,30 @@ package com.vehicle.router.plotting;
 import com.vehicle.router.model.Route;
 import javafx.collections.ListChangeListener;
 
+import java.util.List;
+
 public class RoutesSolveListener implements ListChangeListener<Route> {
 
-    private final GraphPlotter graphPlotter;
+    private final GraphingTool graphingTool;
 
-    public RoutesSolveListener(GraphPlotter graphPlotter) {
-        this.graphPlotter = graphPlotter;
+    public RoutesSolveListener(GraphingTool graphingTool) {
+        this.graphingTool = graphingTool;
     }
 
     @Override
     public void onChanged(Change<? extends Route> change) {
         while (change.next()) {
             if (change.wasAdded()){
-                graphPlotter.plotRoutes(change.getList());
+                addRoutesOnTask(change.getList());
             }
         }
+    }
+
+    private void addRoutesOnTask(List<? extends Route> routes) {
+        new Thread(new DelegateTask<>(() -> {
+            graphingTool.clearRoutes();
+            graphingTool.addRoutes(routes);
+            return true;
+        })).start();
     }
 }

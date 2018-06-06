@@ -3,12 +3,14 @@ package com.vehicle.router.plotting;
 import com.vehicle.router.model.Node;
 import javafx.collections.ListChangeListener;
 
+import java.util.List;
+
 public class InputDataChangeListener implements ListChangeListener<Node> {
 
-    private final GraphPlotter graphPlotter;
+    private final GraphingTool graphingTool;
 
-    public InputDataChangeListener(GraphPlotter graphPlotter) {
-        this.graphPlotter = graphPlotter;
+    public InputDataChangeListener(GraphingTool graphingTool) {
+        this.graphingTool = graphingTool;
     }
 
     @Override
@@ -16,23 +18,27 @@ public class InputDataChangeListener implements ListChangeListener<Node> {
         while (change.next()) {
             boolean wasReplaced = change.wasReplaced();
 
-            graphPlotter.invalidateRoutes();
-
             if (change.wasAdded() && !wasReplaced) {
-                if (change.getAddedSize() == 1) {
-                    graphPlotter.addNode(change.getFrom());
-                } else {
-                    graphPlotter.addAllNodes();
-                }
+                addNodesOnTask(change.getAddedSubList());
             } else if (wasReplaced) {
-                graphPlotter.updateNode(change.getFrom());
+                graphingTool.updateNode(change.getList().get(change.getFrom()));
             } else if (change.wasRemoved()) {
-                if (change.getRemovedSize() == 1) {
-                    graphPlotter.deleteNode(change.getFrom());
-                } else {
-                    graphPlotter.clear();
-                }
+                removeNodesOnTask(change.getRemoved());
             }
         }
+    }
+
+    private void addNodesOnTask(List<? extends Node> nodes) {
+        new Thread(new DelegateTask<>(() -> {
+            graphingTool.addNodes(nodes);
+            return true;
+        })).start();
+    }
+
+    private void removeNodesOnTask(List<? extends Node> nodes) {
+        new Thread(new DelegateTask<>(() -> {
+            graphingTool.removeNodes(nodes);
+            return true;
+        })).start();
     }
 }

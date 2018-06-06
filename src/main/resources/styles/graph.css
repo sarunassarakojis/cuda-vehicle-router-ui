@@ -1,0 +1,11 @@
+node {
+    fill-color: gray;
+}
+
+node.depot {
+    fill-color: red;
+}
+
+node.visited {
+    fill-color: green;
+}

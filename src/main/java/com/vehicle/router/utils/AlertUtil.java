@@ -1,5 +1,6 @@
 package com.vehicle.router.utils;
 
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
@@ -14,6 +15,10 @@ public class AlertUtil {
 
     public static void displayExceptionAlert(Throwable throwable, String title, String header) {
         displayExceptionAlert(throwable, title, header, null);
+    }
+
+    public static void displayExceptionAlertLater(Throwable throwable, String title, String header) {
+        Platform.runLater(() -> displayExceptionAlert(throwable, title, header, null));
     }
 
     public static void displayExceptionAlert(Throwable throwable, String title, String header, String content) {
@@ -50,12 +55,20 @@ public class AlertUtil {
         alert.show();
     }
 
+    public static void displayAlertLater(Alert.AlertType alertType, String title, String header, String content) {
+        Platform.runLater(() -> displayAlert(alertType, title, header, content));
+    }
+
     public static void displayAlert(Alert.AlertType alertType, String title, String header) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(header);
         alert.initModality(Modality.APPLICATION_MODAL);
         alert.show();
+    }
+
+    public static void displayAlertLater(Alert.AlertType alertType, String title, String header) {
+        Platform.runLater(() -> displayAlert(alertType, title, header));
     }
 
     public static void displayAlert(Alert.AlertType alertType, String title) {

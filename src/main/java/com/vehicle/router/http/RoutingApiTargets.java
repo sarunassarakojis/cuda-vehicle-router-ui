@@ -20,11 +20,6 @@ public final class RoutingApiTargets {
         return getRoutingTarget(PARALLEL);
     }
 
-    public static WebTarget getDevicesTarget() {
-        return ClientBuilder.newClient().target(VehicleRouterApp.serverIp)
-                .path(DEVICES);
-    }
-
     public static WebTarget getDevicesTarget(String uri) {
         return ClientBuilder.newClient().target(uri)
                 .path(DEVICES);

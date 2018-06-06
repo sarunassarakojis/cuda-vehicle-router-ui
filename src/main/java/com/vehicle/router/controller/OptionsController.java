@@ -3,6 +3,7 @@ package com.vehicle.router.controller;
 import com.vehicle.router.http.consumer.DeviceInfoServiceConsumer;
 import com.vehicle.router.main.VehicleRouterApp;
 import com.vehicle.router.model.DeviceInfo;
+import com.vehicle.router.plotting.DelegateTask;
 import com.vehicle.router.utils.AlertUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,7 +21,7 @@ public class OptionsController {
     @FXML
     private TextField serverIp;
     @FXML
-    private ComboBox algorithmType;
+    private ComboBox<String> algorithmType;
 
     @FXML
     public void initialize() {
@@ -49,20 +50,27 @@ public class OptionsController {
 
     @FXML
     public void testConnectionWithServer(ActionEvent actionEvent) {
+        new Thread(new DelegateTask<>(() -> {
+            testConnection();
+            return true;
+        })).start();
+    }
+
+    private void testConnection() {
         try {
             List<DeviceInfo> devices = DeviceInfoServiceConsumer.consumeDeviceInfoService(serverIp.getText());
 
             if (devices.size() > 0) {
                 DeviceInfo d = devices.get(0);
-                AlertUtil.displayAlert(Alert.AlertType.INFORMATION, "Success", "Server has a parallel device",
+                AlertUtil.displayAlertLater(Alert.AlertType.INFORMATION, "Success", "Server has a parallel device",
                         String.format("Name: %s, compute capability: %s, threads per block: %d, memory in MB: %d",
                                 d.getDeviceName(), d.getComputeCapability(), d.getMaxThreadsPerBlock(), d.getGlobalMemoryMegabytes()));
             } else {
-                AlertUtil.displayAlert(Alert.AlertType.WARNING, "No Parallel Devices", "Server does not have parallel devices");
+                AlertUtil.displayAlertLater(Alert.AlertType.WARNING, "No Parallel Devices", "Server does not have parallel devices");
             }
 
         } catch (ProcessingException e) {
-            AlertUtil.displayExceptionAlert(e, "Failure to Process Request", "Failed to test connection with a server");
+            AlertUtil.displayExceptionAlertLater(e, "Failure to Process Request", "Failed to test connection with a server");
         }
     }
 }

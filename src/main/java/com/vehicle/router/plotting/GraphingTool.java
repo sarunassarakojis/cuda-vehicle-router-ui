@@ -44,6 +44,20 @@ public class GraphingTool {
         }
     }
 
+    public void updateDepotX(int x) {
+        org.graphstream.graph.Node depot = graph.getNode("D");
+        Object[] xy = (Object[]) depot.getAttribute("xy");
+
+        depot.setAttribute("xy", x, xy[1]);
+    }
+
+    public void updateDepotY(int y) {
+        org.graphstream.graph.Node depot = graph.getNode("D");
+        Object[] xy = (Object[]) depot.getAttribute("xy");
+
+        depot.setAttribute("xy", xy[0], y);
+    }
+
     public void removeNode(Node node) {
         graph.removeNode(String.valueOf(node.getIndice()));
     }

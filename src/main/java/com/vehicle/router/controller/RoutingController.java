@@ -67,9 +67,11 @@ public class RoutingController {
     private VBox stackPane;
     private GraphingTool graphingTool;
     private Graph graph;
+    private int nodeIdCounter;
 
     @FXML
     public void initialize() {
+        nodeIdCounter = 1;
         graph = new MultiGraph("vehicle-router-ui-graph");
         graphingTool = new GraphingTool(graph);
         Converter converter = new Converter();
@@ -95,11 +97,11 @@ public class RoutingController {
         metDemand.setCellValueFactory(new PropertyValueFactory<>("metDemand"));
 
         depotX.textProperty().addListener((observable, oldValue, newValue) -> {
-            // TODO: 6/6/2018 update depot x
+            graphingTool.updateDepotX(parseInt(depotX.getText()));
         });
 
         depotY.textProperty().addListener((observable, oldValue, newValue) -> {
-            // TODO: 6/6/2018 update depot y
+            graphingTool.updateDepotY(parseInt(depotY.getText()));
         });
 
         graphingTool.addDepot(parseInt(depotX.getText()), parseInt(depotY.getText()));
@@ -144,7 +146,7 @@ public class RoutingController {
                 new Triple<>(parseInt(textX.getText()), parseInt(yCoordinate.getText()), parseInt(demand.getText())) : null);
 
         newEntryDialog.showAndWait().ifPresent(t -> inputDataTable.getItems()
-                .add(new Node(inputDataTable.getItems().size() + 1, t.first, t.second, t.third)));
+                .add(new Node(nodeIdCounter++, t.first, t.second, t.third)));
     }
 
     @FXML

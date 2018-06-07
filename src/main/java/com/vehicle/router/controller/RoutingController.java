@@ -97,13 +97,11 @@ public class RoutingController {
         route.setCellValueFactory(callback -> new SimpleStringProperty(callback.getValue().getNodesAsString()));
         metDemand.setCellValueFactory(new PropertyValueFactory<>("metDemand"));
 
-        depotX.textProperty().addListener((observable, oldValue, newValue) -> {
-            graphingTool.updateDepotX(parseInt(depotX.getText()));
-        });
+        depotX.textProperty().addListener((observable, oldValue, newValue) ->
+                graphingTool.updateDepotX(parseInt(depotX.getText())));
 
-        depotY.textProperty().addListener((observable, oldValue, newValue) -> {
-            graphingTool.updateDepotY(parseInt(depotY.getText()));
-        });
+        depotY.textProperty().addListener((observable, oldValue, newValue) ->
+                graphingTool.updateDepotY(parseInt(depotY.getText())));
 
         graphingTool.addDepot(parseInt(depotX.getText()), parseInt(depotY.getText()));
         stackPane.getChildren().add(view);
@@ -172,12 +170,12 @@ public class RoutingController {
     @FXML
     public void route(ActionEvent actionEvent) {
         new Thread(new DelegateTask<>(() -> {
-            route();
+            performRouting();
             return true;
         })).start();
     }
 
-    public void route() {
+    private void performRouting() {
         try {
             List<Route> routes;
 
@@ -205,6 +203,8 @@ public class RoutingController {
 
     @FXML
     public void deleteAll(ActionEvent actionEvent) {
+        nodeIdCounter = 1;
+
         inputDataTable.getItems().clear();
         resultsTable.getItems().clear();
     }
@@ -220,7 +220,10 @@ public class RoutingController {
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
 
             if ((file = fileChooser.showOpenDialog(inputDataTable.getScene().getWindow())) != null) {
-                inputDataTable.getItems().addAll(CsvReader.readCsvExcelFile(file));
+                List<Node> nodes = CsvReader.readCsvExcelFile(file);
+                nodeIdCounter = nodes.size() + 1;
+
+                inputDataTable.getItems().addAll(nodes);
             }
         } catch (IOException e) {
             AlertUtil.displayExceptionAlert(e, "Error", "Error while parsing CSV file");

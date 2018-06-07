@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class VehicleRouterApp extends Application {
 
-    public static int algorithmType = 0;
+    public static int algorithmType = 1;
     public static String serverIp = "http://87.247.109.240:6060";
 
     @Override

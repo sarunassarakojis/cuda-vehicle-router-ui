@@ -5,6 +5,7 @@ import com.vehicle.router.http.consumer.RoutingServiceConsumer;
 import com.vehicle.router.main.VehicleRouterApp;
 import com.vehicle.router.model.Node;
 import com.vehicle.router.model.Route;
+import com.vehicle.router.plotting.DelegateTask;
 import com.vehicle.router.plotting.GraphingTool;
 import com.vehicle.router.plotting.InputDataChangeListener;
 import com.vehicle.router.plotting.RoutesSolveListener;
@@ -170,6 +171,13 @@ public class RoutingController {
 
     @FXML
     public void route(ActionEvent actionEvent) {
+        new Thread(new DelegateTask<>(() -> {
+            route();
+            return true;
+        })).start();
+    }
+
+    public void route() {
         try {
             List<Route> routes;
 
@@ -184,12 +192,15 @@ public class RoutingController {
                     routes = new ArrayList<>();
             }
 
-            resultsTable.getItems().clear();
-            resultsTable.getItems().addAll(routes);
-            tabPane.getSelectionModel().select(1);
+            Platform.runLater(() -> {
+                resultsTable.getItems().clear();
+                resultsTable.getItems().addAll(routes);
+                tabPane.getSelectionModel().select(1);
+            });
         } catch (Exception e) {
-            AlertUtil.displayExceptionAlert(e, "Failure to Process Request", "Routing request cannot be completed");
+            AlertUtil.displayExceptionAlertLater(e, "Failure to Process Request", "Routing request cannot be completed");
         }
+
     }
 
     @FXML
@@ -214,10 +225,6 @@ public class RoutingController {
         } catch (IOException e) {
             AlertUtil.displayExceptionAlert(e, "Error", "Error while parsing CSV file");
         }
-    }
-
-    @FXML
-    public void toggleNumberAxes(ActionEvent actionEvent) {
     }
 
     private RoutingRequestEntity constructRoutingRequestData() {

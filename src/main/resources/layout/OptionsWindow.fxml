@@ -11,9 +11,6 @@
             <MenuItem disable="true" text="Open CSV..."/>
             <MenuItem onAction="#exit" text="Exit"/>
         </Menu>
-        <Menu text="View">
-            <MenuItem disable="true" text="Toggle Number Axes"/>
-        </Menu>
         <Menu text="Options">
             <MenuItem disable="true" text="Properties"/>
         </Menu>
